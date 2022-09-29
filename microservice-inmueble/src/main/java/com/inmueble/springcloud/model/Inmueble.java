@@ -31,7 +31,7 @@ public class Inmueble {
 	@Column(name = "c_direccion", length = 500, nullable = false)
 	private String direccion;
 	
-	@Column(name = "c_foto", length = 120, nullable = false)
+	@Column(name = "c_foto", length = 120, nullable = true)
 	private String picture;
 	
 	@Column(name = "c_precio", nullable = true)

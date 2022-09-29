@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.core.Authentication;
 
+import com.compra.springcloud.modelos.UsuarioEntity;
 import com.compra.springcloud.security.UserPrincipal;
 
 public interface JwtProvider {
@@ -13,5 +14,7 @@ public interface JwtProvider {
 	Authentication getAuthentication(HttpServletRequest servletRequest);
 
 	boolean isValidToken(HttpServletRequest servletRequest);
+
+	String generateToken(UsuarioEntity user);
 
 }

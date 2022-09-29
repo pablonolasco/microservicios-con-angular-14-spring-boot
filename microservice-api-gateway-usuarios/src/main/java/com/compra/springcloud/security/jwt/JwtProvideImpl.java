@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.compra.springcloud.modelos.UsuarioEntity;
 import com.compra.springcloud.security.UserPrincipal;
 import com.compra.springcloud.utils.SecurityUtils;
 
@@ -41,17 +42,31 @@ public class JwtProvideImpl implements JwtProvider {
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.joining(","));
 		// obtener key
-		Key keys= Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+        Key keys = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
 		
 		return Jwts.builder()
 				.setSubject(principal.getUsername())
 				.claim("roles",authorities)
 				.claim("userId",principal.getId())
 				.setExpiration(new Date(System.currentTimeMillis()+JWT_EXPIRATION_IN_MS))
-				.signWith(keys,SignatureAlgorithm.HS512)
+                .signWith(keys, SignatureAlgorithm.HS512)
 				.compact();
 		
 	}
+	
+	 @Override
+	public String generateToken(UsuarioEntity user)
+	    {
+	        Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+
+	        return Jwts.builder()
+	                .setSubject(user.getUsername())
+	                .claim("roles", user.getRol())
+	                .claim("userId", user.getId())
+	                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_IN_MS))
+	                .signWith(key, SignatureAlgorithm.HS512)
+	                .compact();
+	    }
 	
 	
 	// obtiene la utenticacion

@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.data.annotation.Transient;
+
 import com.compra.springcloud.enums.Rol;
 
 import lombok.AllArgsConstructor;
@@ -41,4 +43,7 @@ public class UsuarioEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", nullable = false)
 	private Rol rol;
+	
+	@Transient
+	private String token;
 }

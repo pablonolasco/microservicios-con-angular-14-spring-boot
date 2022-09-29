@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.compra.springcloud.enums.Rol;
 import com.compra.springcloud.modelos.UsuarioEntity;
 import com.compra.springcloud.repository.UsuarioRepository;
+import com.compra.springcloud.security.jwt.JwtProvider;
 import com.compra.springcloud.service.UsuarioService;
 
 @Transactional
@@ -22,10 +23,13 @@ public class UsuarioServiceImpl implements UsuarioService{
 	private final UsuarioRepository usuarioRepository;
 	
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	private final JwtProvider jwtProvider;
 
-	public UsuarioServiceImpl(UsuarioRepository usuarioRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+	public UsuarioServiceImpl(UsuarioRepository usuarioRepository, BCryptPasswordEncoder bCryptPasswordEncoder,JwtProvider jwtProvider) {
 		this.usuarioRepository = usuarioRepository;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+		this.jwtProvider=jwtProvider;
 	}
 	
 	@Override
@@ -33,14 +37,15 @@ public class UsuarioServiceImpl implements UsuarioService{
 		usuarioEntity.setPassword(bCryptPasswordEncoder.encode(usuarioEntity.getPassword()));
 		usuarioEntity.setFechaAlta(LocalDateTime.now());
 		usuarioEntity.setRol(Rol.USER);
-		return usuarioRepository.saveAndFlush(usuarioEntity);
+		UsuarioEntity usuarioEntityCreado =usuarioRepository.saveAndFlush(usuarioEntity);
+		String token=jwtProvider.generateToken(usuarioEntityCreado);
+		usuarioEntityCreado.setToken(token);
+		return usuarioEntityCreado;
 	}
 	
 	@Override
 	public Optional<UsuarioEntity> buscarPorUsername(String username) {
-		return Optional.ofNullable(usuarioRepository.findByUsername(username)
-				.orElseThrow(()->
-				new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("No se encontro el registro con el username: ", username))));
+		return Optional.ofNullable(usuarioRepository.findByUsername(username).orElse(null));
 	}
 	
 	@Override

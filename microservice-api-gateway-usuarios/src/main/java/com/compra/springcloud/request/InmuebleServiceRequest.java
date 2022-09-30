@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-		value="inmueble-service",
+		value="microservice-inmueble",
 		path="/api/inmuebles",
-		url="${inmueble.service.url}",
+		//url="${inmueble.service.url}",
 		configuration = FeignConfiguration.class
 		)
 public interface InmuebleServiceRequest {

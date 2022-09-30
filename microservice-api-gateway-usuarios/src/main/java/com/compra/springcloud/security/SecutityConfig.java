@@ -5,6 +5,7 @@ import javax.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.compra.springcloud.enums.Rol;
 import com.compra.springcloud.security.jwt.JwtAuthorizationFilter;
 
 @Configuration
@@ -55,11 +57,17 @@ public class SecutityConfig {
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 		// paths publicos
 
-		httpSecurity.csrf().disable().cors().disable().authorizeRequests()
-				.antMatchers("/api/auth/iniciar-sesion", "/api/auth/crear-cuenta").permitAll() // paths acceso con logeo
-																								// previo
-				.and().authenticationManager(authenticationManager).sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		httpSecurity.cors();
+		httpSecurity.csrf().disable();
+		httpSecurity.authenticationManager(authenticationManager);
+		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		httpSecurity.authorizeRequests()
+				.antMatchers("/api/autenticacion/ingresar-sesion", "/api/autenticacion/crear-cuenta").permitAll() // paths acceso con logeo
+				.antMatchers(HttpMethod.GET,"gateway/inmueble").permitAll()																				// previo
+				.antMatchers("gateway/inmueble").hasRole(Rol.ADMIN.name())																				// previo
+				.anyRequest().authenticated();
+		
 		httpSecurity.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		return httpSecurity.build();
